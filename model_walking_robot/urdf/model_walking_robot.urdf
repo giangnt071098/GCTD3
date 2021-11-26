@@ -1,0 +1,832 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-1-g15f4949  Build Version: 1.6.7594.29634
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="model_walking_robot">
+  <link
+    name="outer">
+    <inertial>
+      <origin
+        xyz="0 1.17911174381034E-17 0.27"
+        rpy="0 0 0" />
+      <mass
+        value="7.8461276523405" />
+      <inertia
+        ixx="0.224840595537383"
+        ixy="2.65378294214624E-34"
+        ixz="-1.61950322468978E-33"
+        iyy="0.224840595537383"
+        iyz="-9.58139410096276E-18"
+        izz="0.0683593871710166" />
+    </inertial>
+    <!-- <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/outer.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual> -->
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/outer.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="inner">
+    <inertial>
+      <origin
+        xyz="7.19899451244344E-09 0.051342110170787 2.0909026800648E-17"
+        rpy="0 0 0" />
+      <mass
+        value="2.04750018356053" />
+      <inertia
+        ixx="0.00510862510861458"
+        ixy="6.50695920133535E-21"
+        ixz="-1.32882636163963E-21"
+        iyy="0.0064417540076182"
+        iyz="1.6923578780152E-19"
+        izz="0.00510284442335247" />
+    </inertial>
+    <!-- <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/inner.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual> -->
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/inner.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="outer_inner"
+    type="prismatic">
+    <origin
+      xyz="0 0 0.54"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="outer" />
+    <child
+      link="inner" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="0"
+      upper="15"
+      effort="30"
+      velocity="7" />
+  </joint>
+  <link
+    name="boom">
+    <inertial>
+      <origin
+        xyz="0.30945306335003 0.0473145780307749 -0.000999992801005488"
+        rpy="0 0 0" />
+      <mass
+        value="0.619889566900609" />
+      <inertia
+        ixx="0.000137844506436206"
+        ixy="-0.000515135702716944"
+        ixz="1.59877842486669E-18"
+        iyy="0.0351048960688149"
+        iyz="7.82094038765436E-21"
+        izz="0.0351334639743691" />
+    </inertial>
+    <!-- <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/boom.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual> -->
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/boom.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="inner_boom"
+    type="fixed">
+    <origin
+      xyz="0 0.113 0"
+      rpy="0 1.5707963267949 0" />
+    <parent
+      link="inner" />
+    <child
+      link="boom" />
+    <axis
+      xyz="1 0 0" />
+  </joint>
+  <link
+    name="waist">
+    <inertial>
+      <origin
+        xyz="-7.1989941718368E-09 0.0400103261092284 1.11022302462516E-16"
+        rpy="0 0 0" />
+      <mass
+        value="4.01998674910519" />
+      <inertia
+        ixx="0.0154509071172697"
+        ixy="-1.68919622398471E-19"
+        ixz="1.3233427625093E-08"
+        iyy="0.021943723603859"
+        iyz="-9.30073746422473E-10"
+        izz="0.016401264547167" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0.06 0.105 -0.15"
+        rpy="3.1415 3.1415 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/waist.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/waist.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="boom_waist"
+    type="prismatic">
+    <origin
+      xyz="0.755 0 -0.00100000000000005"
+      rpy="3.14159265358979 1.5707963267949 0" />
+    <parent
+      link="boom" />
+    <child
+      link="waist" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-0.7"
+      upper="0.7"
+      effort="30"
+      velocity="7" />
+  </joint>
+  <link
+    name="thighL">
+    <inertial>
+      <origin
+        xyz="0.0826936143108347 1.40909222761617E-05 -0.0392803649772838"
+        rpy="0 0 0" />
+      <mass
+        value="1.73240719186685" />
+      <inertia
+        ixx="0.00193687251801477"
+        ixy="-4.62286718425613E-06"
+        ixz="-0.000111776769961168"
+        iyy="0.0158067892196136"
+        iyz="-1.90393149506783E-08"
+        izz="0.0164155685991032" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/thighL.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/thighL.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="waist_thighL"
+    type="revolute">
+    <origin
+      xyz="0 0.0400000000000006 -0.0999999750000001"
+      rpy="0 0 1.5707963267949" />
+    <parent
+      link="waist" />
+    <child
+      link="thighL" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.8"
+      upper="1.2"
+      effort="30"
+      velocity="7" />
+      <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+  <link
+    name="shankL">
+    <inertial>
+      <origin
+        xyz="0.109765341608996 7.198993974512E-09 -0.0359242864894747"
+        rpy="0 0 0" />
+      <mass
+        value="0.752705749771722" />
+      <inertia
+        ixx="0.000543001635183371"
+        ixy="7.32544622311454E-20"
+        ixz="6.25965968188823E-07"
+        iyy="0.00570696428800581"
+        iyz="4.22956354763003E-20"
+        izz="0.00555361605434965" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/shankL.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/shankL.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="thighL_shankL"
+    type="revolute">
+    <origin
+      xyz="0.266666666666667 0.000185760300002946 0"
+      rpy="0 0 0" />
+    <parent
+      link="thighL" />
+    <child
+      link="shankL" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.4"
+      upper="0.0011"
+      effort="30"
+      velocity="7" />
+      <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+  <link
+    name="footL">
+    <inertial>
+      <origin
+        xyz="0.0228571994422284 -0.0416413298698771 -0.0348689292809387"
+        rpy="0 0 0" />
+      <mass
+        value="0.511828554387412" />
+      <inertia
+        ixx="0.000585471587422535"
+        ixy="0.000124383760225028"
+        ixz="1.54130885742212E-06"
+        iyy="0.00127586288029254"
+        iyz="-1.97539600506023E-06"
+        izz="0.00120395153719814" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/footL.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/footL.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="shankL_footL"
+    type="revolute">
+    <origin
+      xyz="0.252836870251188 0 0"
+      rpy="0 0 1.5707963267949" />
+    <parent
+      link="shankL" />
+    <child
+      link="footL" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.5"
+      upper="0.5"
+      effort="30"
+      velocity="7" />
+    <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+  <link
+    name="footL_contact">
+    <inertial>
+      <origin
+        xyz="0.008 0.005 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.0246866351724396" />
+      <inertia
+        ixx="8.22887839081319E-07"
+        ixy="-2.3853067538382E-39"
+        ixz="-7.82407268041109E-55"
+        iyy="1.23433175862198E-06"
+        iyz="1.22511301712177E-38"
+        izz="8.22887839081319E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/footL_contact.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.650980392156863 0.619607843137255 0.588235294117647 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/footL_contact.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="footL_footL_contact"
+    type="fixed">
+    <origin
+      xyz="0.060000007198994 -0.0700103296646041 -0.0355000249999999"
+      rpy="0 0 0" />
+    <parent
+      link="footL" />
+    <child
+      link="footL_contact" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="thighR">
+    <inertial>
+      <origin
+        xyz="0.0826936143062789 1.41176424103575E-05 0.0392803649772842"
+        rpy="0 0 0" />
+      <mass
+        value="1.73240719186685" />
+      <inertia
+        ixx="0.00193687252100409"
+        ixy="-4.62734942074504E-06"
+        ixz="0.000111776769955011"
+        iyy="0.0158067892166243"
+        iyz="1.90754370064994E-08"
+        izz="0.0164155685991032" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/thighR.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/thighR.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="waist_thighR"
+    type="revolute">
+    <origin
+      xyz="0 0.0400000000000005 0.0999999749999998"
+      rpy="0 0 1.5707963267949" />
+    <parent
+      link="waist" />
+    <child
+      link="thighR" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.8"
+      upper="1.2"
+      effort="30"
+      velocity="7" />
+      <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+  <link
+    name="shankR">
+    <inertial>
+      <origin
+        xyz="0.109760857527807 0.000992195931677592 0.0410757635105252"
+        rpy="0 0 0" />
+      <mass
+        value="0.752705749771713" />
+      <inertia
+        ixx="0.000543423572082671"
+        ixy="-4.66764218755953E-05"
+        ixz="6.2594039447528E-07"
+        iyy="0.00570654235110641"
+        iyz="5.65826039472923E-09"
+        izz="0.00555361605434956" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/shankR.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/shankR.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="thighR_shankR"
+    type="revolute">
+    <origin
+      xyz="0.266666666666667 0.0001857603000028 0"
+      rpy="0 0 0" />
+    <parent
+      link="thighR" />
+    <child
+      link="shankR" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.4"
+      upper="0.0011"
+      effort="30"
+      velocity="7" />
+    <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+  <link
+    name="footR">
+    <inertial>
+      <origin
+        xyz="0.0248527527639071 -0.0415135013967698 0.0401347374224651"
+        rpy="0 0 0" />
+      <mass
+        value="0.51088649279347" />
+      <inertia
+        ixx="0.000583531679971185"
+        ixy="0.000122987800381817"
+        ixz="1.53827642549053E-06"
+        iyy="0.00128190499147544"
+        iyz="-1.96937567127747E-06"
+        izz="0.00120870052501031" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/footR.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/footR.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="shankR_footR"
+    type="revolute">
+    <origin
+      xyz="0.252836870251189 0 0.00199715735407346"
+      rpy="0 0 1.5707963267949" />
+    <parent
+      link="shankR" />
+    <child
+      link="footR" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.5"
+      upper="0.5"
+      effort="30"
+      velocity="7" />
+    <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+  <link
+    name="footR_contact">
+    <inertial>
+      <origin
+        xyz="-0.00799999999999967 0.00500000000000039 2.22044604925031E-16"
+        rpy="0 0 0" />
+      <mass
+        value="0.0246866351724396" />
+      <inertia
+        ixx="8.22887839081319E-07"
+        ixy="-2.262782233395E-39"
+        ixz="-6.73533776298349E-39"
+        iyy="1.23433175862198E-06"
+        iyz="2.45769554730746E-39"
+        izz="8.22887839081319E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/footR_contact.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.650980392156863 0.619607843137255 0.588235294117647 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://model_walking_robot/meshes/footR_contact.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="footR_footR_contact"
+    type="fixed">
+    <origin
+      xyz="0.0622855480513896 -0.07 0.0395028676459267"
+      rpy="3.14159265358979 0 3.14159265358979" />
+    <parent
+      link="footR" />
+    <child
+      link="footR_contact" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+<link name="world"/>
+
+ <joint name="grounding" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"></origin>
+    <parent link="world"/>
+    <child link="outer"/>
+  </joint>
+
+<gazebo reference="waist">
+      <material>Gazebo/Red</material>
+  </gazebo>
+  <gazebo reference="thighR">
+      <material>Gazebo/Green</material>
+  </gazebo>
+    <gazebo reference="thighL">
+      <material>Gazebo/Green</material>
+  </gazebo>
+    <gazebo reference="shankR">
+      <material>Gazebo/Blue</material>
+  </gazebo>
+    <gazebo reference="shankL">
+      <material>Gazebo/Blue</material>
+  </gazebo>
+    <gazebo reference="footR">
+      <material>Gazebo/DarkYellow</material>
+  </gazebo>
+    <gazebo reference="footL">
+      <material>Gazebo/DarkYellow</material>
+  </gazebo>
+    <gazebo reference="boom">
+      <material>Gazebo/Transparent</material>
+  </gazebo>
+  <!-- Contact sensor-->
+  <gazebo reference="footR_contact">
+  <sensor name="footR_contact_sensor" type="contact">
+    <always_on>true</always_on>
+    <update_rate>120.0</update_rate>
+    <contact>
+      <collision>footR_collision</collision>
+    </contact>
+    <plugin name="gazebo_ros_bumper_controller_1" filename="libgazebo_ros_bumper.so">
+      <bumperTopicName>/footR_contact_sensor_state</bumperTopicName>
+      <frameName>footR_contact</frameName>
+    </plugin>
+  </sensor>
+</gazebo>
+  <gazebo reference="footL_contact">
+  <sensor name="footL_contact_sensor" type="contact">
+    <always_on>true</always_on>
+    <update_rate>120.0</update_rate>
+    <contact>
+      <collision>footL_collision</collision>
+    </contact>
+    <plugin name="gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">
+      <bumperTopicName>/footL_contact_sensor_state</bumperTopicName>
+      <frameName>footL_contact</frameName>
+    </plugin>
+  </sensor>
+</gazebo>
+
+  <transmission name="tran1">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="waist_thighR">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor1">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran2">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="waist_thighL">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor2">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran3">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="thighR_shankR">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor3">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran4">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="thighL_shankL">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor4">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran5">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="shankR_footR">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor5">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran6">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="shankL_footL">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor6">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran7">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="boom_waist">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor7">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran8">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="outer_inner">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor8">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+    </plugin>
+  </gazebo>
+
+  
+
+
+</robot>

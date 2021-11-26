@@ -1,0 +1,54 @@
+<launch>
+
+  <arg name="show_rviz" default="false"/>
+  <arg name="debug" default="false"/>
+  <arg name="gui" default="true"/>
+
+  
+  <!-- Robot pose -->
+  <arg name="x" default="0"/>
+  <arg name="y" default="0"/>
+  <arg name="z" default="0"/>
+
+  <arg name="roll" default="0"/>
+  <arg name="pitch" default="0"/>
+  <arg name="yaw" default="0"/>
+  
+  <include
+    file="$(find gazebo_ros)/launch/empty_world.launch" >
+    <arg name="paused" value="true"/>
+  </include> 
+
+  <env name="GAZEBO_RESOURCE_PATH" value="$GAZEBO_RESOURCE_PATH:$(find model_walking_robot)/media/gazebo.material" />
+
+  <param name="robot_description" 
+         textfile='$(find model_walking_robot)/urdf/model_walking_robot.urdf' />  
+
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+  <node name="walker_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" 
+    args="-urdf -param robot_description -model model_walking_robot -x $(arg x) -y $(arg y) -z $(arg z)
+              -R $(arg roll) -P $(arg pitch) -Y $(arg yaw)" />
+  
+
+  <!-- <group if="$(arg show_rviz)"> -->
+    <!-- <node name="rviz" pkg="rviz" type="rviz" output="screen"/>  -->
+
+  <rosparam file="$(find model_walking_robot)/config/joint_names_model_walking_robot.yaml" command="load" />
+
+  <node name="walker_controller_node" pkg="controller_manager" type="spawner" output="screen" 
+    args="  joint_state_controller
+            waist_thighR_position_controller 
+            waist_thighL_position_controller 
+            thighR_shankR_position_controller   
+            thighL_shankL_position_controller 
+            shankR_footR_position_controller 
+            shankL_footL_position_controller " />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+    respawn="false" output="screen">
+  </node>
+  
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
+  	<param name="use_gui" value="true"/>
+  </node>
+  <!-- </group> -->
+</launch>

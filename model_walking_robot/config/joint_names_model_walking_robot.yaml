@@ -1,0 +1,47 @@
+#controller_joint_names: ['', 'Waist_ThighL', 'ThighL_ShankL', 'ShankL_FootL', 'Waist_ThighR', 'ThighR_ShankR', 'ShankR_FootR', ]
+
+#Controller script for the biped walker#
+
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+
+# Effort Controllers & Position Controllers
+waist_thighR_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: waist_thighR
+  pid: {p: 50, i: 0.26, d: 10}
+
+waist_thighL_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: waist_thighL
+  pid: {p: 50, i: 0.26, d: 10}
+
+thighR_shankR_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: thighR_shankR
+  pid: {p: 50, i: 0.2, d: 3}
+thighL_shankL_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: thighL_shankL
+  pid: {p: 50, i: 0.2, d: 3}
+
+shankR_footR_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: shankR_footR
+  pid: {p: 63, i: 0.01, d: 1}
+
+shankL_footL_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: shankL_footL
+  pid: {p: 63, i: 0.01, d: 1}
+
+boom_waist_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: boom_waist
+  pid: {p: 1, i: 0.0, d: 0}
+
+outer_inner_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: outer_inner
+  pid: {p: 1, i: 0.0, d: 0}

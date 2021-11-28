@@ -3,3 +3,4 @@
 CMakeList.txt
 *.STL
 *.npy
+*.pyc

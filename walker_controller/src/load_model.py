@@ -1,9 +1,9 @@
-from GCTD3 import GCTD3
-from buffer import ReplayBuffer
-from GCActorTD3 import GCActorTD3
-from GCTD3his import GCTD3his
-from TD3 import TD3
-import utils
+# from net.other.GCTD3 import GCTD3
+from utils.buffer import ReplayBuffer
+# from net.GCActorTD3.GCActorTD3 import GCActorTD3
+from net.GCTD3his.GCTD3his import GCTD3his
+from net.TD3.TD3 import TD3
+from utils.utils import *
 
 
 import gc
@@ -36,19 +36,16 @@ import numpy as np
 parser = argparse.ArgumentParser()
 parser.add_argument("--expl_noise", default=0.1, type=float)
 parser.add_argument("--load_model", action="store_true") 
-parser.add_argument("--save_model", action="store_true") 
 parser.add_argument("--file_name", default="GCTD3_Walking_Robot")
-parser.add_argument("--batch_size", default=64, type = int)
 parser.add_argument("--agent", default="GCTD3")
 args = parser.parse_args()
 
 FILE_NAME = args.file_name
 EPISODES = 500000
-TEST = 1
-BUFFER_SIZE = 1000000
+TEST = 50
 NUMBER_HISTORY=5
 
-reward_file = "reward_file_test.csv"
+reward_file = f"net/{args.agent}/reward_file_test.csv"
 trajectory_file = "trajectory_file.csv"
 
 pubHipR = rospy.Publisher('/waist_thighR_position_controller/command', Float64, queue_size=10)
@@ -68,7 +65,7 @@ fall = 0
 rospy.init_node('walker_control_script')
 env = [(8,2), 6] # [state_dim, action_dim] (8 is number of nodes, 2 is number of feature)
 parent_child = ((1,0),(2,0),(1,2), (2,1),(3,1),(4,2),(5,3),(6,4)) # delete (2,1)
-Adj_matrix = utils.get_adjacency_matrix(env[0][0], parent_child)
+Adj_matrix = get_adjacency_matrix(env[0][0], parent_child)
 if args.agent == "GCTD3":
     agent = GCTD3(env[0][0], env[0][1]*NUMBER_HISTORY, env[1], Adj_matrix)
     FILE_NAME = "GCTD3_Walking_Robot"
@@ -96,7 +93,7 @@ if args.agent == "TD3":
     freq = 50
 # load and save model
 if args.load_model == True:
-    agent.load_model(PATH_LOAD)
+    agent.load_model(PATH_LOAD,args.agent)
 #agent2 = GCActorTD3(env[0][0], env[0][1], env[1], Adj_matrix)
 rate = rospy.Rate(freq) 
 class RobotState(object):
@@ -195,6 +192,126 @@ def set_robot_state():
     robot_state.robot_state = [[robot_state.waist_z, robot_state.vel_z], [robot_state.hipr_theta, robot_state.hipr_theta_dot], [robot_state.hipl_theta, robot_state.hipl_theta_dot], \
         [robot_state.kneer_theta, robot_state.kneer_theta_dot], [robot_state.kneel_theta, robot_state.kneel_theta_dot], [robot_state.ankelr_theta, robot_state.ankelr_theta_dot], \
         [robot_state.ankell_theta, robot_state.ankell_theta_dot], [robot_state.footr_contact, robot_state.footl_contact]]
+def take_action(action, observes, y_set):
+    rospy.wait_for_service('/gazebo/unpause_physics')
+
+    try:
+        unpause()
+    except (rospy.ServiceException) as e:
+        print("/gazebo/pause_physics service call failed")
+
+    pubHipR.publish(action[0])
+    pubKneeR.publish(action[1])
+    pubAnkelR.publish(action[2])
+    pubHipL.publish(action[3])
+    pubKneeL.publish(action[4])
+    pubAnkelL.publish(action[5])
+
+    # constant weight 
+    ctrl_cost_weights = 0.0
+    cost_fall_weights = 0.005#3.0
+    constant_vy = 0.9
+    c1,c2 = 0.0, 1.0
+    sum_vel = c1*np.abs(robot_state.hipl_theta_dot**2 + robot_state.hipr_theta_dot**2)
+    height = observes[0][::2]
+    kneer_theta = observes[3][::2]
+    kneel_theta = observes[4][::2]
+    mean_h = np.mean(height)
+    delta = y_set[0] - y_set[-1]
+    
+
+    reward = -0.1
+    reward += min(robot_state.vel_y, 0.9) + 0.2*delta
+    
+    # if delta >0 :
+    #     reward += 22*delta
+    # else:
+    #     reward -= delta
+    #reward += c2*min(robot_state.vel_y, constant_vy) + ctrl_cost_weights*sum_vel- cost_fall_weights*np.abs(np.abs(robot_state.waist_z -mean_h) - 0.002)
+    #reward += robot_state.vel_y - ctrl_cost_weights*np.sum(np.square(action)) - cost_fall_weights*np.abs(robot_state.waist_z -0.017)
+    #reward += constant_vy - np.abs(constant_vy - robot_state.vel_y) - ctrl_cost_weights*np.sum(np.square(action)) - cost_fall_weights*(robot_state.waist_z -0.016)**2
+
+
+    # --- 2 states of walking with 2 other target_h
+    for col in range(0, observes.shape[1], 2):
+        state = observes[:,col:col+2]
+        if sum(state[7]) == 0:
+            reward -= 0.01
+        else:
+            if sum(state[7]) == 1:
+                target_h = 0.001
+            else:
+                target_h = 0.025
+            reward -= cost_fall_weights*np.abs(robot_state.waist_z - target_h)
+
+    # if (np.max(kneer_theta)-np.min(kneer_theta))<0.1:
+    #     reward -= 0.001
+    # if (np.max(kneel_theta)-np.min(kneel_theta))<0.1:
+    #     reward -= 0.001
+
+
+    if (robot_state.hipl_theta) * robot_state.signhipL > 0:
+        robot_state.count_hipL += 1
+    else:
+        robot_state.count_hipL = 0
+        robot_state.signhipL *= -1
+    if (robot_state.hipr_theta)*robot_state.signhipR > 0:
+        robot_state.count_hipR += 1
+    else:
+        robot_state.count_hipR = 0
+        robot_state.signhipR *= -1
+
+    # if robot_state.waist_z < -0.012:
+    #     reward += 0.01 * robot_state.waist_z #punish if robot stand on tiptoe 
+    # if np.abs(robot_state.waist_y - robot_state.last_y) <1e-3:
+    #     robot_state.count_state += 1
+    #     reward -= 0.001*(robot_state.count_state)
+    # else:
+    #     robot_state.count_state = 0
+    #     robot_state.last_y = robot_state.waist_y
+
+    if robot_state.footl_contact:
+        robot_state.count_contactL += 1
+    else:
+        robot_state.count_contactL = 0
+
+    if robot_state.footr_contact:
+        robot_state.count_contactR += 1
+    else:
+        robot_state.count_contactR = 0
+    #print(observes)
+    
+
+    #### reset environment
+    if robot_state.count_contactR > 40 or robot_state.count_contactL > 40:
+        robot_state.done = True
+        robot_state.fall = 1
+        robot_state.count_contactL, robot_state.count_contactR = 0, 0
+        robot_state.count_hipR, robot_state.count_hipL =0, 0
+        reward -= 0.2
+    if robot_state.count_hipL>50 or robot_state.count_hipR > 50:
+        robot_state.done = True
+        robot_state.fall = 1
+        robot_state.count_hipR, robot_state.count_hipL =0, 0
+        reward -= 0.5
+
+    # if robot_state.count_state > 30:
+    #     robot_state.done = True
+    #     robot_state.fall = 1
+    #     robot_state.count_state =0
+
+    
+    if robot_state.waist_z > 0.1:
+        reward -= 10
+        robot_state.done = True
+        robot_state.fall = 1
+    if robot_state.outer_ring_inner_ring_theta > 14.0:
+        reward += 10
+        robot_state.done = True
+        robot_state.fall = 1
+        #print("REACH TO THE END!")
+    rate.sleep()
+    return reward, robot_state.done
 
 def take_action_ver2(action, observes):
     rospy.wait_for_service('/gazebo/unpause_physics')
@@ -328,7 +445,7 @@ def callbackJointStates(data):
         robot_state.hipl_theta_dot = data.velocity[6]
         robot_state.hipr_theta_dot = data.velocity[7]
 
-        robot_state.waist_z = data.position[0] #init distance between boom and waist = 0.0235 (rostopic echo /joint_states)
+        robot_state.waist_z = data.position[0] - 0.0235#init distance between boom and waist = 0.0235 (rostopic echo /joint_states)
         robot_state.waist_y = data.position[1]
         robot_state.outer_ring_inner_ring_theta = data.position[1]
         robot_state.ankell_theta = data.position[2]
@@ -399,7 +516,6 @@ def publisher(pubHipR, pubHipL, pubKneeR, pubKneeL, pubAnkelR, pubAnkelL, rate, 
 
 
         robot_state.best_reward =200 # manual 
-        replay_buffer = ReplayBuffer(env[0], env[1], max_size=BUFFER_SIZE)
 
         # Testing:
         traj_file = open(trajectory_file, 'wt')
@@ -407,30 +523,30 @@ def publisher(pubHipR, pubHipL, pubKneeR, pubKneeL, pubAnkelR, pubAnkelL, rate, 
         traj_writer.writerow(['z', 'y', 'vel_z', 'vel_y', 'hr', 'hl', 'hr_dot', 'hl_dot', 'kr', 'kl', 'kr_dot', 'kl_dot', 'ar', 'al', 'ar_dot', 'al_dot', 'fr', 'fl'])
 
         print("testing")
-        
-        for i in range(TEST):
+        nb_test = 0
+        while (nb_test < TEST):
             total_reward = 0
             reset()
             state = robot_state.robot_state
             observes = np.concatenate([state]*NUMBER_HISTORY, axis=1)
-
-            for steps in range(1600):    
+            y_set = np.zeros(NUMBER_HISTORY)
+            for steps in range(500):    
                 number_step += 1
                 action = agent.predict_action(observes) # direct action for test
-                # action = utils.modify_action(action)
+                # action = modify_action(action)
                 #action = [0,0,0,0,0,0]
-                reward, done, _ = take_action_ver2(action, observes)
+                reward, done = take_action(action, observes, y_set)
                 state = robot_state.robot_state
                 observes = np.append(state, observes[:,:env[0][1]*(NUMBER_HISTORY-1)], axis=1)
 
                 # replay_buffer.add(state, action, state, reward, done)
                 # if number_step > 66:
-                #     agent2.train(replay_buffer, batch_size= 64)
-                if steps %1 == 0:         
-                    traj_writer.writerow([robot_state.waist_z, robot_state.waist_y, robot_state.vel_z, robot_state.vel_y, robot_state.hipr_theta, robot_state.hipl_theta, robot_state.hipr_theta_dot, robot_state.hipl_theta_dot, \
-                                            robot_state.kneer_theta, robot_state.kneel_theta, robot_state.kneer_theta_dot, robot_state.kneel_theta_dot, robot_state.ankelr_theta, robot_state.ankell_theta, robot_state.ankelr_theta_dot, \
-                                            robot_state.ankell_theta_dot, robot_state.footr_contact, robot_state.footl_contact])
-                    traj_file.flush()
+                #     agent2.train(replay_buffer, batch_size= 64)        
+                traj_writer.writerow([robot_state.waist_z, robot_state.waist_y, robot_state.vel_z, robot_state.vel_y, robot_state.hipr_theta, robot_state.hipl_theta, robot_state.hipr_theta_dot, robot_state.hipl_theta_dot, \
+                                        robot_state.kneer_theta, robot_state.kneel_theta, robot_state.kneer_theta_dot, robot_state.kneel_theta_dot, robot_state.ankelr_theta, robot_state.ankell_theta, robot_state.ankelr_theta_dot, \
+                                        robot_state.ankell_theta_dot, robot_state.footr_contact, robot_state.footl_contact])
+                traj_file.flush()
+                y_set = np.append(robot_state.waist_y, y_set[:NUMBER_HISTORY-1])
                 total_reward += reward
                 if done:
                     robot_state.done = False
@@ -440,10 +556,14 @@ def publisher(pubHipR, pubHipL, pubKneeR, pubKneeL, pubAnkelR, pubAnkelL, rate, 
             if ave_reward > robot_state.best_reward:
                 robot_state.best_reward = ave_reward
             robot_state.avg_reward = ave_reward
+            if ave_reward > 100:
+                nb_test +=1
+            else:
+                continue
             writer.writerow([ave_reward])
             file.flush()
 
-            print("episode: ",i, "number step: ", number_step,"Evaluation Average Reward: ",ave_reward)
+            print("episode: ",nb_test, "number step: ", number_step,"Evaluation Average Reward: ",ave_reward)
             print("best_reward: ", robot_state.best_reward)
         break
 

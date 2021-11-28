@@ -1,13 +1,13 @@
 from os import stat
 
 import torch
-from GCTD3 import GCTD3
-from GCActorTD3 import GCActorTD3
-from GCActorTD3his import GCActorTD3his
-from TD3 import TD3
-from GCTD3his import GCTD3his
-from buffer import ReplayBuffer
-import utils
+from net.other.GCTD3 import GCTD3
+from net.GCActorTD3.GCActorTD3 import GCActorTD3
+from net.other.GCActorTD3his import GCActorTD3his
+from net.TD3.TD3 import TD3
+from net.GCTD3his.GCTD3his import GCTD3his
+from utils.buffer import ReplayBuffer
+from utils.utils import *
 
 
 import gc
@@ -76,7 +76,7 @@ rospy.init_node('walker_control_script')
 
 env = [(8,2), 6] # [state_dim, action_dim] (8 is number of nodes, 2 is number of feature)
 parent_child = ((1,0),(2,0),(1,2), (2,1),(3,1),(4,2),(5,3),(6,4)) # delete (2,1)
-Adj_matrix = utils.get_adjacency_matrix(env[0][0], parent_child)
+Adj_matrix = get_adjacency_matrix(env[0][0], parent_child)
 replay_buffer = ReplayBuffer((env[0][0], env[0][1]*NUMBER_HISTORY), env[1], max_size=BUFFER_SIZE)
 
 if args.agent == "GCTD3":
@@ -107,7 +107,7 @@ if args.agent == "TD3":
 replaybuffer_mem = "replaybuffer_{}.npy".format(args.agent)
 save = False
 if args.load_model == True:
-    agent.load_model(PATH_LOAD)
+    agent.load_model(PATH_LOAD, args.agent)
     agent.training = True
     # load_mem = np.load(replaybuffer_mem,  allow_pickle=True)
     # for mdp in load_mem:
@@ -557,7 +557,7 @@ def publisher(pubHipR, pubHipL, pubKneeR, pubKneeL, pubAnkelR, pubAnkelL, rate, 
                     number_step += 1
                     action = agent.select_action(observes, expl_noise)
                     #action = [1, -0.5, -1, -0.5,-0.5,0]
-                    #act = utils.modify_action(action)
+                    #act = modify_action(action)
                     # reward,done, expl_noise = take_action_ver2(action, observes)
                     reward, done, expl_noise = take_action(action, observes, y_set)
                     next_state = robot_state.robot_state
@@ -566,7 +566,7 @@ def publisher(pubHipR, pubHipL, pubKneeR, pubKneeL, pubAnkelR, pubAnkelL, rate, 
                         replay_buffer.add(observes, action, next_observes, reward, done)
                     else:
                         expl_noise = 0.2
-                    #replay_buffer.add(*utils.flip_transition(state, action, next_state, reward, done))
+                    #replay_buffer.add(*flip_transition(state, action, next_state, reward, done))
                     if replay_buffer.size > START_TRAINING:
                         agent.train(replay_buffer, batch_size = args.batch_size)
                     last_action = action
@@ -595,7 +595,7 @@ def publisher(pubHipR, pubHipL, pubKneeR, pubKneeL, pubAnkelR, pubAnkelL, rate, 
                         y_set = np.zeros(NUMBER_HISTORY)
                         for steps in range(1600):
                             action = agent.predict_action(observes) # direct action for test
-                            #act = utils.modify_action(action)
+                            #act = modify_action(action)
                             # reward,done, _ = take_action_ver2(action, observes)
                             reward,done, _ = take_action(action, observes, y_set)
                             #time.sleep(0.001) # sleep time code
@@ -614,11 +614,11 @@ def publisher(pubHipR, pubHipL, pubKneeR, pubKneeL, pubAnkelR, pubAnkelL, rate, 
                     robot_state.latest_reward = ave_reward
                     if ave_reward > robot_state.best_reward:
                         robot_state.best_reward = ave_reward
-                        if save: agent.save_model(FILE_NAME)
+                        if save: agent.save_model(FILE_NAME, args.agent)
                     if save and number_step > START_TRAINING and ave_reward > 400 and episode >1000: 
-                        agent.save_model(FILE_NAME+"_"+str(round(ave_reward,2)))
+                        agent.save_model(FILE_NAME+"_"+str(round(ave_reward,2)), args.agent)
                     if save and number_step > START_TRAINING and ave_reward > 300: 
-                        agent.save_model(FILE_NAME+"_final")
+                        agent.save_model(FILE_NAME+"_final", args.agent)
                     robot_state.avg_reward = ave_reward
                     writer.writerow([ave_reward])
                     file.flush()

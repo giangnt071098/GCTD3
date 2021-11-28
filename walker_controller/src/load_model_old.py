@@ -5,9 +5,7 @@ import gc
 gc.enable()
 
 
-import roslib
 import rospy
-import rostopic
 import random
 import time
 import math
@@ -15,13 +13,9 @@ import csv
 from std_srvs.srv import Empty
 from gazebo_msgs.srv import SetModelConfiguration
 
-from control_msgs.msg import JointControllerState
 from sensor_msgs.msg import JointState
-from gazebo_msgs.msg import LinkStates
 from gazebo_msgs.msg import ContactsState
 from std_msgs.msg import Float64
-from std_msgs.msg import String
-from sensor_msgs.msg import Joy
 
 import threading
 from scipy.interpolate import interp1d
@@ -200,14 +194,6 @@ def take_action(action, observes, y_set):
     reward = -0.1
     reward += min(robot_state.vel_y, 0.9) + 0.2*delta
     
-    # if delta >0 :
-    #     reward += 22*delta
-    # else:
-    #     reward -= delta
-    #reward += c2*min(robot_state.vel_y, constant_vy) + ctrl_cost_weights*sum_vel- cost_fall_weights*np.abs(np.abs(robot_state.waist_z -mean_h) - 0.002)
-    #reward += robot_state.vel_y - ctrl_cost_weights*np.sum(np.square(action)) - cost_fall_weights*np.abs(robot_state.waist_z -0.017)
-    #reward += constant_vy - np.abs(constant_vy - robot_state.vel_y) - ctrl_cost_weights*np.sum(np.square(action)) - cost_fall_weights*(robot_state.waist_z -0.016)**2
-
 
     # --- 2 states of walking with 2 other target_h
     for col in range(0, observes.shape[1], 2):
@@ -221,12 +207,6 @@ def take_action(action, observes, y_set):
                 target_h = 0.025
             reward -= cost_fall_weights*np.abs(robot_state.waist_z - target_h)
 
-    # if (np.max(kneer_theta)-np.min(kneer_theta))<0.1:
-    #     reward -= 0.001
-    # if (np.max(kneel_theta)-np.min(kneel_theta))<0.1:
-    #     reward -= 0.001
-
-
     if (robot_state.hipl_theta) * robot_state.signhipL > 0:
         robot_state.count_hipL += 1
     else:
@@ -237,15 +217,6 @@ def take_action(action, observes, y_set):
     else:
         robot_state.count_hipR = 0
         robot_state.signhipR *= -1
-
-    # if robot_state.waist_z < -0.012:
-    #     reward += 0.01 * robot_state.waist_z #punish if robot stand on tiptoe 
-    # if np.abs(robot_state.waist_y - robot_state.last_y) <1e-3:
-    #     robot_state.count_state += 1
-    #     reward -= 0.001*(robot_state.count_state)
-    # else:
-    #     robot_state.count_state = 0
-    #     robot_state.last_y = robot_state.waist_y
 
     if robot_state.footl_contact:
         robot_state.count_contactL += 1
@@ -271,11 +242,6 @@ def take_action(action, observes, y_set):
         robot_state.fall = 1
         robot_state.count_hipR, robot_state.count_hipL =0, 0
         reward -= 0.5
-
-    # if robot_state.count_state > 30:
-    #     robot_state.done = True
-    #     robot_state.fall = 1
-    #     robot_state.count_state =0
     
     if robot_state.waist_z > 0.1:
         reward -= 10
@@ -292,8 +258,6 @@ def take_action(action, observes, y_set):
 
 
 def callbackJointStates(data):
-    # ['boom_waist', 'outer_ring_inner_ring', 'thighL_shankL', 'thighR_shankR', 'waist_thighL', 'waist_thighR']
-    # if vel == 0 ['waist_thighR', 'waist_thighL', 'thighR_shankR', 'thighL_shankL', 'outer_ring_inner_ring', 'boom_waist']
     robot_state.data = data
 
     if len(data.velocity)!=0:
